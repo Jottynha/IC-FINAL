@@ -1,0 +1,62 @@
+
+================================================================================
+RELATÓRIO DE ANÁLISE EXPLORATÓRIA DE DADOS
+Dataset: Diabetes 130-US Hospitals for Years 1999-2008
+================================================================================
+
+1. INFORMAÇÕES GERAIS
+--------------------------------------------------------------------------------
+   - Total de Registros: 101,766
+   - Total de Features: 33
+   - Tipos de Dados: {dtype('int64'): 33}
+   - Tamanho em Memória: 25.62 MB
+   - Valores Faltantes: 0
+
+2. CARACTERÍSTICAS ESTATÍSTICAS
+--------------------------------------------------------------------------------
+   - Média Geral: 31.3268
+   - Desvio Padrão Médio: 17.0565
+   - Mínimo Geral: 0.0000
+   - Máximo Geral: 788.0000
+
+3. DISTRIBUIÇÃO DE DADOS
+--------------------------------------------------------------------------------
+   - Assimetria (Skewness) Média: 1.6681
+   - Curtose (Kurtosis) Média: 51.4131
+   - Distribuição predominante: Assimétrica
+
+4. VARIÂNCIA DOS DADOS
+--------------------------------------------------------------------------------
+   - Variância Total: 80874.6777
+   - Top 5 Features com Maior Variância:
+     1. diag_3: 31023.8969
+     2. diag_1: 25770.4241
+     3. diag_2: 23368.9092
+     4. num_lab_procedures: 387.0805
+     5. medical_specialty: 178.3330
+
+5. CORRELAÇÃO
+--------------------------------------------------------------------------------
+   - Correlação Máxima (excluindo diagonal): 0.5064
+   - Correlação Mínima: 0.0000
+
+6. NATUREZA DO DATASET
+--------------------------------------------------------------------------------
+   Este dataset representa dados de 130 hospitais dos EUA cobrindo o período
+   de 1999-2008. Cada registro representa um paciente hospitalizado com
+   diagnóstico de diabetes. O dataset inclui:
+   
+   - Dados Clínicos: resultados de testes de laboratório, medicações
+   - Dados Demográficos: idade, sexo, raça
+   - Dados de Hospitalização: tempo de internação, tipo de admissão
+   - Dados de Readmissão: indicador de readmissão em 30 dias
+   
+   Características Principais:
+   - Dataset altamente desbalanceado em algumas variáveis
+   - Múltiplas categorias com valores codificados numericamente
+   - Ausência de valores faltantes após preprocessamento
+   - Forte potencial para problemas de classificação
+
+================================================================================
+FIM DO RELATÓRIO
+================================================================================
