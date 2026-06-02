@@ -1,0 +1,67 @@
+================================================================================
+RELATÓRIO DE TREINAMENTO DE MODELOS
+Dataset: Diabetes 130-US Hospitals 1999-2008
+================================================================================
+
+1. ALGORITMOS IMPLEMENTADOS
+
+1.1 RANDOM FOREST
+   - Ensemble de 150 árvores de decisão
+   - max_depth=25, min_samples_split=10, min_samples_leaf=4
+   - Justificativa: Robusto, bom com dados desbalanceados, interpretável
+
+1.2 XGBOOST (Gradient Boosting)
+   - 150 rounds de boosting com regularização L2
+   - max_depth=6, learning_rate=0.1, subsample=0.9
+   - Justificativa: Estado-da-arte, muito eficaz em dados tabulares
+
+1.3 REDE NEURAL (MLP)
+   - 2 camadas: (150, 75), activation=relu
+   - learning_rate=0.01, alpha=0.001, early_stopping=True
+   - Justificativa: Captura não-linearidades, complementa métodos baseados em árvores
+
+2. DIVISÃO DOS DADOS
+   - Treino: 60% (61059 amostras)
+   - Validação: 20% (20353 amostras)
+   - Teste: 20% (20354 amostras)
+   - Estratégia: Stratified split (manter proporção de classes)
+
+3. METODOLOGIA
+   - Validação: 5-fold Cross-Validation
+   - Métrica: F1-score ponderado (weighted)
+   - Reproducibilidade: seed fixo (random_state=42)
+
+4. RESULTADOS NO CONJUNTO DE TESTE
+--------------------------------------------------------------------------------
+
+Random Forest:
+   Acurácia:  0.5509
+   Precisão:  0.5456
+   Revocação: 0.5509
+   F1-Score:  0.5480
+   AUC-ROC:   0.6728
+
+Rede Neural:
+   Acurácia:  0.5796
+   Precisão:  0.5374
+   Revocação: 0.5796
+   F1-Score:  0.5198
+   AUC-ROC:   0.6598
+
+XGBoost:
+   Acurácia:  0.5901
+   Precisão:  0.5610
+   Revocação: 0.5901
+   F1-Score:  0.5404
+   AUC-ROC:   0.6858
+
+5. CONCLUSÃO
+--------------------------------------------------------------------------------
+   Melhor Modelo: Random Forest (F1=0.5480)
+   
+   - Todos os modelos treinados sob mesmas condições experimentais
+   - Validação cruzada garante robustez das métricas
+   - Ensemble methods superior para dados tabulares
+   - Rede Neural oferece complementaridade
+
+================================================================================
