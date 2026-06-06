@@ -52,6 +52,28 @@ Foram selecionadas três abordagens distintas de aprendizado supervisionado para
 
 O Random Forest foi selecionado devido à robustez frente a dados heterogêneos e à capacidade de lidar com grande quantidade de atributos. O XGBoost foi incluído devido ao elevado desempenho frequentemente reportado em tarefas de mineração de dados e classificação supervisionada. Por fim, Redes Neurais MLP foram utilizadas visando explorar a capacidade de modelagem de relações não lineares complexas presentes em dados clínicos. O pipeline experimental contempla etapas de coleta dos dados, preparação e pré-processamento, treinamento dos modelos, ajuste de hiperparâmetros e avaliação comparativa de desempenho.
 
+## Como Executar o Código
+Para executar o código deste projeto, siga as instruções abaixo:
+
+```bash
+# Clone o repositório
+git clone Jottynha/IC-FINAL.git
+# Acesse o diretório do projeto
+cd IC-FINAL
+# Instale as dependências necessárias
+pip install -r requirements.txt
+# [Opcional] Execute a analise exploratória dos dados 
+python3 exploratory_analysis.py
+# Execute o preprocessamento dos dados
+python3 preprocess_diabetes.py
+# Treine os modelos de aprendizado de máquina
+python3 model_training.py
+```
+## Artefatos gerados
+- `output/`: Diretório contendo os resultados dos experimentos, incluindo métricas de desempenho, gráficos e relatórios gerados durante a análise.
+- `models/`: Diretório onde os modelos treinados são salvos para posterior avaliação e comparação.
+- `output/analise_exploratoria/`: Subdiretório específico para os artefatos relacionados à análise exploratória dos dados, como gráficos de distribuição, correlações e relações iniciais.
+
 
 ## Referências
 
