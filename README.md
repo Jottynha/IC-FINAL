@@ -62,12 +62,12 @@ git clone Jottynha/IC-FINAL.git
 cd IC-FINAL
 # Instale as dependências necessárias
 pip install -r requirements.txt
-# [Opcional] Execute a analise exploratória dos dados 
-python3 exploratory_analysis.py
 # Execute o preprocessamento dos dados
-python3 preprocess_diabetes.py
+python3 src/preprocess_diabetes.py
+# [Opcional] Execute a analise exploratória dos dados 
+python3 src/exploratory_analysis.py
 # Treine os modelos de aprendizado de máquina
-python3 model_training.py
+python3 src/model_training.py
 ```
 ## Artefatos gerados
 - `output/`: Diretório contendo os resultados dos experimentos, incluindo métricas de desempenho, gráficos e relatórios gerados durante a análise.

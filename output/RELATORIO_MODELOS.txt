@@ -35,29 +35,29 @@ Dataset: Diabetes 130-US Hospitals 1999-2008
 --------------------------------------------------------------------------------
 
 Random Forest:
-   Acurácia:  0.5509
-   Precisão:  0.5456
-   Revocação: 0.5509
-   F1-Score:  0.5480
-   AUC-ROC:   0.6728
+->   Acurácia:  0.5307
+->   Precisão:  0.5450
+->   Revocação: 0.5307
+->   F1-Score:  0.5367
+->   AUC-ROC:   0.6678
 
 Rede Neural:
-   Acurácia:  0.5796
-   Precisão:  0.5374
-   Revocação: 0.5796
-   F1-Score:  0.5198
-   AUC-ROC:   0.6598
+->   Acurácia:  0.5720
+->   Precisão:  0.5284
+->   Revocação: 0.5720
+->   F1-Score:  0.5248
+->   AUC-ROC:   0.6488
 
 XGBoost:
-   Acurácia:  0.5901
-   Precisão:  0.5610
-   Revocação: 0.5901
-   F1-Score:  0.5404
-   AUC-ROC:   0.6858
+->   Acurácia:  0.5909
+->   Precisão:  0.5619
+->   Revocação: 0.5909
+->   F1-Score:  0.5414
+->   AUC-ROC:   0.6843
 
 5. CONCLUSÃO
 --------------------------------------------------------------------------------
-   Melhor Modelo: Random Forest (F1=0.5480)
+   Melhor Modelo: XGBoost (F1=0.5414)
    
    - Todos os modelos treinados sob mesmas condições experimentais
    - Validação cruzada garante robustez das métricas

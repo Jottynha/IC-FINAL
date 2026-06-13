@@ -3,9 +3,6 @@ numpy
 matplotlib
 scikit-learn
 seaborn
-warnings
 xgboost
-pathlib
-sklearn
 ucimlrepo
 joblib

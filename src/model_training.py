@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
+import re
 import warnings
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -21,13 +22,37 @@ warnings.filterwarnings('ignore')
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (14, 8)
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+def sanitize_column_names(df):
+    clean_columns = []
+    seen = {}
+
+    for col in df.columns:
+        clean = re.sub(r"[\[\]<>]", "", str(col))
+        clean = re.sub(r"[^0-9a-zA-Z_]+", "_", clean).strip("_")
+        clean = clean or "feature"
+
+        if clean in seen:
+            seen[clean] += 1
+            clean = f"{clean}_{seen[clean]}"
+        else:
+            seen[clean] = 0
+
+        clean_columns.append(clean)
+
+    df = df.copy()
+    df.columns = clean_columns
+    return df
+
 class ModelTrainer:
     def __init__(self, csv_path, random_state=42):
         self.random_state = random_state
-        self.output_dir = Path('/home/joao/Projetos/IC-FINAL/output')
-        self.models_dir = Path('/home/joao/Projetos/IC-FINAL/models')
+        self.output_dir = PROJECT_ROOT / 'output'
+        self.models_dir = PROJECT_ROOT / 'models'
+        self.output_dir.mkdir(exist_ok=True)
         self.models_dir.mkdir(exist_ok=True)
-        self.df = pd.read_csv(csv_path)
+        self.df = sanitize_column_names(pd.read_csv(csv_path))
         self._prepare_data()
         print(f"Dataset carregado: {self.X.shape[0]} amostras × {self.X.shape[1]} features")
         print(f"Distribuição de classes:\n{self.y.value_counts().to_string()}")
@@ -274,7 +299,7 @@ Dataset: Diabetes 130-US Hospitals 1999-2008
         print("TREINAMENTO CONCLUÍDO!")
         print("="*80)
 def main():
-    csv_path = '/home/joao/Projetos/IC-FINAL/dataset/diabetes_processed.csv'
+    csv_path = PROJECT_ROOT / 'dataset' / 'diabetes_processed.csv'
     try:
         trainer = ModelTrainer(csv_path)
         trainer.run_full_training()

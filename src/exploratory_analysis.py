@@ -10,11 +10,13 @@ sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (16, 12)
 plt.rcParams['font.size'] = 10
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 class ExploratoryAnalysis:
     def __init__(self, csv_path):
         self.df = pd.read_csv(csv_path)
-        self.output_dir = Path('/home/joao/Projetos/IC-FINAL/output/analise_exploratoria')
-        self.output_dir.mkdir(exist_ok=True)
+        self.output_dir = PROJECT_ROOT / 'output' / 'analise_exploratoria'
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         print(f"Dataset carregado: {self.df.shape[0]} linhas × {self.df.shape[1]} colunas")
     def analyze_basic_statistics(self):
         print("\n" + "="*80)
@@ -277,7 +279,7 @@ FIM DO RELATÓRIO
         self.plot_feature_variance()
         self.generate_summary_report()
 def main():
-    csv_path = '/home/joao/Projetos/IC-FINAL/dataset/diabetes_processed.csv'
+    csv_path = PROJECT_ROOT / 'dataset' / 'diabetes_processed.csv'
     try:
         analysis = ExploratoryAnalysis(csv_path)
         analysis.run_full_analysis()
