@@ -12,7 +12,7 @@ import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    confusion_matrix, roc_auc_score
+    classification_report, confusion_matrix, roc_auc_score
 )
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.neural_network import MLPClassifier
@@ -27,6 +27,7 @@ plt.rcParams['figure.figsize'] = (14, 8)
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SCORING_METRIC = "f1_weighted"
 CV_FOLDS = 3
+CLASS_LABELS = {0: "<30", 1: ">30", 2: "NO"}
 
 HYPERPARAMETER_GRIDS = {
     "Random Forest": {
@@ -78,6 +79,10 @@ def format_params(params):
     return ", ".join(f"{key}={value}" for key, value in params.items())
 
 
+def safe_filename(name):
+    return re.sub(r"[^0-9a-zA-Z]+", "_", name).strip("_").lower()
+
+
 class ModelTrainer:
     def __init__(self, csv_path, random_state=42):
         self.random_state = random_state
@@ -87,6 +92,7 @@ class ModelTrainer:
         self.models_dir.mkdir(exist_ok=True)
         self.search_results = []
         self.best_params = {}
+        self.best_cv_scores = {}
         self.df = sanitize_column_names(pd.read_csv(csv_path))
         self._prepare_data()
         print(f"Dataset carregado: {self.X.shape[0]} amostras x {self.X.shape[1]} features")
@@ -99,9 +105,10 @@ class ModelTrainer:
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             self.X, self.y, test_size=0.2, random_state=self.random_state, stratify=self.y
         )
-
-
-
+    def _algorithm_output_dir(self, model_name):
+        path = self.output_dir / 'algoritmos' / safe_filename(model_name)
+        path.mkdir(parents=True, exist_ok=True)
+        return path
     def _search_hyperparameters(self, model_name, estimator, param_grid, X_train, y_train):
         print(f"\nGridSearchCV ({model_name})")
         cv = StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=self.random_state)
@@ -118,6 +125,7 @@ class ModelTrainer:
         search.fit(X_train, y_train)
 
         self.best_params[model_name] = search.best_params_
+        self.best_cv_scores[model_name] = search.best_score_
         print(f"Melhor configuração ({model_name}): {format_params(search.best_params_)}")
         print(f"Melhor F1 médio em CV ({model_name}): {search.best_score_:.4f}")
 
@@ -205,14 +213,122 @@ class ModelTrainer:
             auc = roc_auc_score(y_true, y_proba, multi_class='ovr', average='weighted')
         except ValueError:
             auc = 0.0
+        class_report = classification_report(
+            y_true,
+            y_pred,
+            labels=list(CLASS_LABELS.keys()),
+            target_names=list(CLASS_LABELS.values()),
+            output_dict=True,
+            zero_division=0,
+        )
         print(f"-> Acurácia={acc:.4f}, Precisão={prec:.4f}, Revocação={rec:.4f}, F1={f1:.4f}, AUC={auc:.4f}")
         return {'accuracy': acc, 'precision': prec, 'recall': rec, 'f1': f1, 'auc': auc,
-                'y_pred': y_pred, 'y_proba': y_proba}
+                'classification_report': class_report, 'y_pred': y_pred, 'y_proba': y_proba}
 
     def save_hyperparameter_search_results(self):
         print("\n[Salvando] Resultados da busca de hiperparâmetros")
         df = pd.concat(self.search_results, ignore_index=True)
+        df['parametros_formatados'] = df['params'].apply(format_params)
         df.to_csv(f'{self.output_dir}/hyperparameter_search_results.csv', index=False)
+
+    def plot_class_distribution(self):
+        print("\n[Gerando] Distribuição das classes")
+        counts = self.y.value_counts().sort_index()
+        labels = [CLASS_LABELS.get(label, str(label)) for label in counts.index]
+        percentages = counts / counts.sum() * 100
+
+        distribution = pd.DataFrame({
+            'Classe': labels,
+            'Codificação': counts.index,
+            'Quantidade': counts.values,
+            'Percentual': percentages.values,
+        })
+        distribution.to_csv(f'{self.output_dir}/class_distribution.csv', index=False)
+
+        fig, ax = plt.subplots(figsize=(9, 6))
+        bars = ax.bar(labels, counts.values, color=['#4C78A8', '#F58518', '#54A24B'])
+        ax.set_title('Distribuição da Variável-Alvo', fontweight='bold')
+        ax.set_xlabel('Classe de Readmissão')
+        ax.set_ylabel('Quantidade de registros')
+        ax.grid(alpha=0.3, axis='y')
+        for bar, pct in zip(bars, percentages.values):
+            height = bar.get_height()
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                height,
+                f'{int(height):,}\n({pct:.1f}%)'.replace(',', '.'),
+                ha='center',
+                va='bottom',
+                fontsize=10,
+            )
+        plt.tight_layout()
+        plt.savefig(f'{self.output_dir}/09_distribuicao_classes.png', dpi=300, bbox_inches='tight')
+        plt.close()
+
+    def save_best_hyperparameters_table(self):
+        print("\n[Salvando] Tabela de melhores hiperparâmetros")
+        rows = []
+        for model_name in sorted(self.best_params.keys()):
+            rows.append({
+                'Modelo': model_name,
+                'Melhor F1 médio em CV': self.best_cv_scores[model_name],
+                'Melhores hiperparâmetros': format_params(self.best_params[model_name]),
+            })
+        pd.DataFrame(rows).to_csv(f'{self.output_dir}/best_hyperparameters.csv', index=False)
+
+    def plot_grid_search_results(self):
+        print("\n[Gerando] Resultados do GridSearchCV por algoritmo")
+        df = pd.concat(self.search_results, ignore_index=True).copy()
+        df['Configuração'] = df.groupby('model').cumcount() + 1
+        df['Configuração'] = df['Configuração'].astype(str)
+
+        for model_name in df['model'].unique():
+            subset = df[df['model'] == model_name].sort_values('rank_test_score')
+            fig, ax = plt.subplots(figsize=(9, 6))
+            colors = ['#54A24B' if rank == 1 else '#4C78A8' for rank in subset['rank_test_score']]
+            bars = ax.bar(subset['Configuração'], subset['mean_test_score'], color=colors)
+            ax.set_title(f'Resultados do GridSearchCV - {model_name}', fontweight='bold')
+            ax.set_xlabel('Configuração')
+            ax.set_ylabel('F1-score ponderado médio (CV)')
+            ax.set_ylim(0, max(0.01, subset['mean_test_score'].max() * 1.12))
+            ax.grid(alpha=0.3, axis='y')
+            for bar, score in zip(bars, subset['mean_test_score']):
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_height(),
+                    f'{score:.4f}',
+                    ha='center',
+                    va='bottom',
+                    fontsize=9,
+                )
+            plt.tight_layout()
+            algorithm_dir = self._algorithm_output_dir(model_name)
+            plt.savefig(algorithm_dir / 'gridsearchcv_resultados.png', dpi=300, bbox_inches='tight')
+            plt.close()
+
+    def save_classification_reports(self):
+        print("\n[Salvando] Classification report por classe")
+        rows = []
+        text_blocks = []
+        for model_name in sorted(self.results.keys()):
+            raw_report = self.results[model_name]['classification_report']
+            tabular_report = {
+                key: value for key, value in raw_report.items()
+                if isinstance(value, dict)
+            }
+            report_df = pd.DataFrame(tabular_report).T
+            report_df.insert(0, 'Modelo', model_name)
+            report_df.insert(1, 'Classe', report_df.index)
+            rows.append(report_df.reset_index(drop=True))
+            text_blocks.append(f"{model_name}\n{'-' * len(model_name)}\n")
+            text_blocks.append(report_df.to_string(index=False))
+            text_blocks.append("\n\n")
+
+        pd.concat(rows, ignore_index=True).to_csv(
+            f'{self.output_dir}/classification_report_por_classe.csv', index=False
+        )
+        with open(f'{self.output_dir}/classification_report_por_classe.txt', 'w', encoding='utf-8') as f:
+            f.write(''.join(text_blocks))
 
     def plot_comparison_results(self):
         print("\n[Gerando] Gráfico de Comparação")
@@ -245,43 +361,86 @@ class ModelTrainer:
         plt.savefig(f'{self.output_dir}/10_comparacao_modelos.png', dpi=300, bbox_inches='tight')
         plt.close()
 
+    def plot_model_metrics_by_algorithm(self):
+        print("\n[Gerando] Métricas por algoritmo")
+        metric_names = {
+            'accuracy': 'Acurácia',
+            'precision': 'Precisão',
+            'recall': 'Revocação',
+            'f1': 'F1-Score',
+            'auc': 'AUC-ROC',
+        }
+        for model_name, result in self.results.items():
+            labels = list(metric_names.values())
+            values = [result[key] for key in metric_names.keys()]
+            fig, ax = plt.subplots(figsize=(9, 6))
+            bars = ax.bar(labels, values, color='#4C78A8')
+            ax.set_title(f'Métricas no Teste - {model_name}', fontweight='bold')
+            ax.set_ylabel('Valor')
+            ax.set_ylim(0, 1)
+            ax.grid(alpha=0.3, axis='y')
+            for bar, value in zip(bars, values):
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_height(),
+                    f'{value:.4f}',
+                    ha='center',
+                    va='bottom',
+                    fontsize=10,
+                )
+            plt.tight_layout()
+            algorithm_dir = self._algorithm_output_dir(model_name)
+            plt.savefig(algorithm_dir / 'metricas.png', dpi=300, bbox_inches='tight')
+            plt.close()
+
     def plot_confusion_matrices(self):
-        print("\n[Gerando] Matrizes de Confusão")
-        fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-        fig.suptitle('Matrizes de Confusão (Conjunto de Teste)', fontsize=14, fontweight='bold')
-        for model_name, ax in zip(['Random Forest', 'XGBoost', 'Rede Neural'], axes):
+        print("\n[Gerando] Matrizes de Confusão por algoritmo")
+        for model_name in ['Random Forest', 'XGBoost', 'Rede Neural']:
+            fig, ax = plt.subplots(figsize=(7, 6))
             cm = confusion_matrix(self.y_test, self.results[model_name]['y_pred'])
-            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax, cbar_kws={'label': 'Freq'})
-            ax.set_title(model_name, fontweight='bold')
+            sns.heatmap(
+                cm,
+                annot=True,
+                fmt='d',
+                cmap='Blues',
+                xticklabels=list(CLASS_LABELS.values()),
+                yticklabels=list(CLASS_LABELS.values()),
+                ax=ax,
+                cbar_kws={'label': 'Freq'},
+            )
+            ax.set_title(f'Matriz de Confusão - {model_name}', fontweight='bold')
             ax.set_ylabel('Verdadeiro')
             ax.set_xlabel('Predito')
-        plt.tight_layout()
-        plt.savefig(f'{self.output_dir}/11_matrizes_confusao.png', dpi=300, bbox_inches='tight')
-        plt.close()
+            plt.tight_layout()
+            algorithm_dir = self._algorithm_output_dir(model_name)
+            plt.savefig(algorithm_dir / 'matriz_confusao.png', dpi=300, bbox_inches='tight')
+            plt.close()
 
     def plot_feature_importance(self):
-        print("\n[Gerando] Importância das Features")
-        fig, axes = plt.subplots(1, 2, figsize=(16, 6))
-        fig.suptitle('Importância das Features (Top 15)', fontsize=14, fontweight='bold')
-        rf_imp = pd.DataFrame({'feature': self.X_train.columns,
-                              'importance': self.rf_best.feature_importances_
-                            }).sort_values('importance', ascending=False).head(15)
-        axes[0].barh(range(len(rf_imp)), rf_imp['importance'].values, color='steelblue')
-        axes[0].set_yticks(range(len(rf_imp)))
-        axes[0].set_yticklabels(rf_imp['feature'].values, fontsize=9)
-        axes[0].set_title('Random Forest', fontweight='bold')
-        axes[0].grid(alpha=0.3, axis='x')
-        xgb_imp = pd.DataFrame({'feature': self.X_train.columns,
-                               'importance': self.xgb_best.feature_importances_
-                             }).sort_values('importance', ascending=False).head(15)
-        axes[1].barh(range(len(xgb_imp)), xgb_imp['importance'].values, color='coral')
-        axes[1].set_yticks(range(len(xgb_imp)))
-        axes[1].set_yticklabels(xgb_imp['feature'].values, fontsize=9)
-        axes[1].set_title('XGBoost', fontweight='bold')
-        axes[1].grid(alpha=0.3, axis='x')
-        plt.tight_layout()
-        plt.savefig(f'{self.output_dir}/12_importancia_features.png', dpi=300, bbox_inches='tight')
-        plt.close()
+        print("\n[Gerando] Importância das Features por algoritmo")
+        feature_importances = {
+            'Random Forest': self.rf_best.feature_importances_,
+            'XGBoost': self.xgb_best.feature_importances_,
+        }
+
+        for model_name, importances in feature_importances.items():
+            importance_df = pd.DataFrame({
+                'feature': self.X_train.columns,
+                'importance': importances,
+            }).sort_values('importance', ascending=False).head(15)
+
+            fig, ax = plt.subplots(figsize=(9, 7))
+            ax.barh(range(len(importance_df)), importance_df['importance'].values, color='#4C78A8')
+            ax.set_yticks(range(len(importance_df)))
+            ax.set_yticklabels(importance_df['feature'].values, fontsize=9)
+            ax.invert_yaxis()
+            ax.set_title(f'Importância das Features - {model_name}', fontweight='bold')
+            ax.set_xlabel('Importância')
+            ax.grid(alpha=0.3, axis='x')
+            plt.tight_layout()
+            algorithm_dir = self._algorithm_output_dir(model_name)
+            plt.savefig(algorithm_dir / 'importancia_features.png', dpi=300, bbox_inches='tight')
+            plt.close()
 
     def save_models(self):
         print("\n[Salvando] Modelos treinados")
@@ -326,8 +485,19 @@ Dataset: Diabetes 130-US Hospitals 1999-2008
    - Teste: usado apenas na avaliação final dos melhores modelos
    - Reprodutibilidade: seed fixo (random_state=42)
    - Resultado detalhado da busca: output/hyperparameter_search_results.csv
+   - Melhores hiperparâmetros: output/best_hyperparameters.csv
+   - Classification report por classe: output/classification_report_por_classe.csv
 
-4. RESULTADOS NO CONJUNTO DE TESTE
+4. ARTEFATOS GRÁFICOS GERADOS
+{'-'*80}
+   - Distribuição das classes: output/09_distribuicao_classes.png
+   - Comparação geral dos modelos: output/10_comparacao_modelos.png
+   - Métricas por algoritmo: output/algoritmos/<algoritmo>/metricas.png
+   - Matrizes de confusão por algoritmo: output/algoritmos/<algoritmo>/matriz_confusao.png
+   - Importância das features por algoritmo: output/algoritmos/<algoritmo>/importancia_features.png
+   - Resultados do GridSearchCV por algoritmo: output/algoritmos/<algoritmo>/gridsearchcv_resultados.png
+
+5. RESULTADOS NO CONJUNTO DE TESTE
 {'-'*80}
 """
 
@@ -341,7 +511,7 @@ Dataset: Diabetes 130-US Hospitals 1999-2008
             report += f"->   AUC-ROC:   {m['auc']:.4f}\n"
 
         report += f"""
-5. CONCLUSÃO
+6. CONCLUSÃO
 {'-'*80}
    Melhor Modelo: {best} (F1={self.results[best]['f1']:.4f})
 
@@ -364,7 +534,12 @@ Dataset: Diabetes 130-US Hospitals 1999-2008
         self.train_neural_network()
         self.evaluate_all_models_on_test()
         self.save_hyperparameter_search_results()
+        self.save_best_hyperparameters_table()
+        self.save_classification_reports()
+        self.plot_class_distribution()
         self.plot_comparison_results()
+        self.plot_model_metrics_by_algorithm()
+        self.plot_grid_search_results()
         self.plot_confusion_matrices()
         self.plot_feature_importance()
         self.save_models()
