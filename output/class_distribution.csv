@@ -1,4 +1,3 @@
-Classe,Codificação,Quantidade,Percentual
-<30,0,11357,11.159915885462727
->30,1,35545,34.92816854352141
-NO,2,54864,53.911915571015854
+Classe,Codificacao,Quantidade,Percentual
+Nao readmitido <30,0,90409,88.84008411453728
+Readmitido <30,1,11357,11.159915885462727

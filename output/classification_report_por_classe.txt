@@ -1,27 +1,34 @@
 Random Forest
 -------------
-       Modelo       Classe  precision   recall  f1-score  support
-Random Forest          <30   0.223008 0.263644  0.241630   2272.0
-Random Forest          >30   0.467188 0.445632  0.456156   7109.0
-Random Forest           NO   0.667769 0.662535  0.665142  10973.0
-Random Forest    macro avg   0.452655 0.457271  0.454309  20354.0
-Random Forest weighted avg   0.548066 0.542252  0.544875  20354.0
+                    precision    recall  f1-score   support
 
-Rede Neural
------------
-     Modelo       Classe  precision   recall  f1-score  support
-Rede Neural          <30   0.293478 0.011884  0.022843   2272.0
-Rede Neural          >30   0.507415 0.288789  0.368086   7109.0
-Rede Neural           NO   0.596201 0.881072  0.711170  10973.0
-Rede Neural    macro avg   0.465698 0.393915  0.367366  20354.0
-Rede Neural weighted avg   0.531400 0.577184  0.514508  20354.0
+Não readmitido <30       0.92      0.74      0.82     18083
+    Readmitido <30       0.20      0.50      0.28      2271
+
+          accuracy                           0.72     20354
+         macro avg       0.56      0.62      0.55     20354
+      weighted avg       0.84      0.72      0.76     20354
+
 
 XGBoost
 -------
- Modelo       Classe  precision   recall  f1-score  support
-XGBoost          <30   0.407407 0.024208  0.045700   2272.0
-XGBoost          >30   0.511909 0.386974  0.440759   7109.0
-XGBoost           NO   0.620478 0.839424  0.713533  10973.0
-XGBoost    macro avg   0.513265 0.416869  0.399998  20354.0
-XGBoost weighted avg   0.558775 0.590400  0.543716  20354.0
+                    precision    recall  f1-score   support
 
+Não readmitido <30       0.92      0.76      0.83     18083
+    Readmitido <30       0.20      0.49      0.29      2271
+
+          accuracy                           0.73     20354
+         macro avg       0.56      0.62      0.56     20354
+      weighted avg       0.84      0.73      0.77     20354
+
+
+Rede Neural
+-----------
+                    precision    recall  f1-score   support
+
+Não readmitido <30       0.91      0.80      0.85     18083
+    Readmitido <30       0.20      0.39      0.26      2271
+
+          accuracy                           0.76     20354
+         macro avg       0.56      0.59      0.56     20354
+      weighted avg       0.83      0.76      0.79     20354

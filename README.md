@@ -42,7 +42,7 @@ Este projeto propõe a aplicação e comparação de diferentes técnicas superv
 
 O conjunto de dados utilizado neste estudo corresponde ao dataset *Diabetes 130-US Hospitals for Years 1999–2008*, amplamente empregado em pesquisas relacionadas à mineração de dados clínicos e predição hospitalar. O dataset reúne registros provenientes de 130 hospitais dos Estados Unidos entre os anos de 1999 e 2008, contendo atributos relacionados ao perfil demográfico dos pacientes, histórico hospitalar, diagnósticos, exames laboratoriais e medicações administradas.
 
-A variável alvo considerada corresponde à ocorrência de readmissão hospitalar em até 30 dias após a alta médica, caracterizando o problema como uma tarefa de classificação supervisionada.
+A variável alvo considerada corresponde à ocorrência de readmissão hospitalar em até 30 dias após a alta médica. O problema é formulado como classificação binária: a classe positiva representa readmissão em menos de 30 dias, enquanto a classe negativa reúne readmissões posteriores a 30 dias e casos sem readmissão.
 
 Antes da etapa de modelagem, os dados passam por procedimentos de preparação envolvendo tratamento de valores ausentes, codificação de atributos categóricos, remoção de redundâncias e redução de atributos pouco informativos, visando melhorar a qualidade dos dados utilizados no treinamento dos modelos.
 

@@ -1,4 +1,4 @@
-Modelo,Melhor F1 médio em CV,Melhores hiperparâmetros
-Random Forest,0.5497109660041232,"max_depth=24, min_samples_leaf=8, min_samples_split=10, n_estimators=120"
-Rede Neural,0.5244621111519173,"mlp__alpha=0.001, mlp__batch_size=64, mlp__hidden_layer_sizes=(100,), mlp__learning_rate_init=0.001"
-XGBoost,0.5446266881242224,"colsample_bytree=0.9, learning_rate=0.1, max_depth=6, n_estimators=120, reg_lambda=0.5, subsample=0.9"
+Modelo,Melhor F1 CV com limiar 0.5,Limiar escolhido,Melhores hiperparâmetros
+Random Forest,0.26900156370894296,0.4954636932083423,"{'class_weight': 'balanced', 'max_depth': 16, 'min_samples_leaf': 8, 'min_samples_split': 10, 'n_estimators': 200}"
+XGBoost,0.273549411516033,0.542879581451416,"{'colsample_bytree': 0.9, 'learning_rate': 0.05, 'max_depth': 4, 'n_estimators': 200, 'reg_lambda': 1.0, 'scale_pos_weight': 7.960158485582214, 'subsample': 0.9}"
+Rede Neural,0.020722737058688653,0.132459691893134,"{'mlp__alpha': 0.01, 'mlp__batch_size': 64, 'mlp__hidden_layer_sizes': (100,), 'mlp__learning_rate_init': 0.01}"

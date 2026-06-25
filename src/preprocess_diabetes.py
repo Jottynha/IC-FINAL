@@ -1,4 +1,4 @@
-# Preprocessamento do Dataset Diabetes 130-US Hospitals for Years 1999-2008
+﻿# Preprocessamento do Dataset Diabetes 130-US Hospitals for Years 1999-2008
 # Dataset: https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
 
 from pathlib import Path
@@ -97,9 +97,11 @@ def encode_categorical(df):
         print("Nenhuma feature categorica encontrada")
 
     if TARGET_COL in df.columns and df[TARGET_COL].dtype == "object":
-        target_mapping = {"<30": 0, ">30": 1, "NO": 2}
-        df[TARGET_COL] = df[TARGET_COL].map(target_mapping)
-        print(f"  {TARGET_COL}: codificado como {target_mapping}")
+        df[TARGET_COL] = (df[TARGET_COL] == "<30").astype(int)
+        print(
+            f"  {TARGET_COL}: codificado como 1 para readmissão <30 dias "
+            "e 0 para >30 dias ou sem readmissão"
+        )
 
     if TARGET_COL in df.columns:
         feature_cols = [col for col in df.columns if col != TARGET_COL]
