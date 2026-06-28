@@ -1,4 +1,4 @@
-﻿"""Repete os experimentos com diferentes seeds para medir estabilidade."""
+"""Repete os experimentos com diferentes seeds para medir estabilidade."""
 
 from ast import literal_eval
 from pathlib import Path
@@ -16,6 +16,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from model_training import compute_metrics, find_best_threshold, sanitize_column_names
+from stability_postprocessing import generate_stability_diagnostics
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -228,6 +229,7 @@ def main():
         index=False,
     )
     plot_stability(summary)
+    generate_stability_diagnostics(details)
 
     print("\nResumo de estabilidade:")
     print(article_table.to_string(index=False))

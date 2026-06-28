@@ -74,6 +74,12 @@ python3 src/stability_experiment.py
 
 O fluxo experimental é dividido em duas etapas. Primeiro, o `model_training.py` utiliza o GridSearchCV para selecionar os hiperparâmetros dos modelos. Em seguida, o `stability_experiment.py` reutiliza os melhores hiperparâmetros e repete a avaliação com cinco sementes aleatórias, produzindo a média e o desvio-padrão das métricas. Essa segunda etapa representa a avaliação final apresentada no relatório e não executa novamente a busca de hiperparâmetros.
 
+Caso o arquivo `output/stability_results_by_seed.csv` já exista, os relatórios por classe e as matrizes de confusão agregadas podem ser regenerados sem treinar os modelos novamente:
+
+```bash
+python3 src/stability_postprocessing.py
+```
+
 ## Artefatos gerados
 - `output/`: Diretório contendo os resultados dos experimentos, incluindo métricas de desempenho, gráficos e relatórios gerados durante a análise.
 - `models/`: Diretório onde os modelos treinados são salvos para posterior avaliação e comparação.
@@ -82,6 +88,9 @@ O fluxo experimental é dividido em duas etapas. Primeiro, o `model_training.py`
 - `output/stability_results_summary.csv`: Média e desvio-padrão das métricas.
 - `output/stability_results_article_table.csv`: Resultados formatados para uso no relatório.
 - `output/11_estabilidade_seeds.png`: Comparação visual da estabilidade dos modelos.
+- `output/stability_classification_report_article_table.csv`: Relatório por classe agregado para uso no relatório.
+- `output/stability_confusion_matrices_summary.csv`: Matrizes de confusão médias e respectivos desvios.
+- `output/algoritmos/<algoritmo>/matriz_confusao_media_normalizada.png`: Matriz normalizada média de cada algoritmo.
 
 
 ## Referências

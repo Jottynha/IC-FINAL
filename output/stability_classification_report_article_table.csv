@@ -1,0 +1,7 @@
+Modelo,Classe,Precisão,Revocação,F1-score,Suporte
+Random Forest,Não readmitido <30,0.9201 ± 0.0049,0.7301 ± 0.0361,0.8137 ± 0.0213,18083
+Random Forest,Readmitido <30,0.1872 ± 0.0067,0.4941 ± 0.0560,0.2709 ± 0.0102,2271
+XGBoost,Não readmitido <30,0.9214 ± 0.0020,0.7456 ± 0.0161,0.8242 ± 0.0094,18083
+XGBoost,Readmitido <30,0.1961 ± 0.0046,0.4936 ± 0.0229,0.2805 ± 0.0049,2271
+Rede Neural,Não readmitido <30,0.9106 ± 0.0015,0.8020 ± 0.0291,0.8526 ± 0.0162,18083
+Rede Neural,Readmitido <30,0.1923 ± 0.0113,0.3728 ± 0.0311,0.2530 ± 0.0062,2271
