@@ -64,15 +64,24 @@ cd IC-FINAL
 pip install -r requirements.txt
 # Execute o preprocessamento dos dados
 python3 src/preprocess_diabetes.py
-# [Opcional] Execute a analise exploratória dos dados 
+# [Opcional] Execute a análise exploratória dos dados
 python3 src/exploratory_analysis.py
-# Treine os modelos de aprendizado de máquina
+# Selecione os hiperparâmetros com GridSearchCV e treine os modelos
 python3 src/model_training.py
+# Execute a avaliação final com cinco sementes aleatórias
+python3 src/stability_experiment.py
 ```
+
+O fluxo experimental é dividido em duas etapas. Primeiro, o `model_training.py` utiliza o GridSearchCV para selecionar os hiperparâmetros dos modelos. Em seguida, o `stability_experiment.py` reutiliza os melhores hiperparâmetros e repete a avaliação com cinco sementes aleatórias, produzindo a média e o desvio-padrão das métricas. Essa segunda etapa representa a avaliação final apresentada no relatório e não executa novamente a busca de hiperparâmetros.
+
 ## Artefatos gerados
 - `output/`: Diretório contendo os resultados dos experimentos, incluindo métricas de desempenho, gráficos e relatórios gerados durante a análise.
 - `models/`: Diretório onde os modelos treinados são salvos para posterior avaliação e comparação.
 - `output/analise_exploratoria/`: Subdiretório específico para os artefatos relacionados à análise exploratória dos dados, como gráficos de distribuição, correlações e relações iniciais.
+- `output/stability_results_by_seed.csv`: Métricas obtidas por modelo em cada uma das cinco sementes.
+- `output/stability_results_summary.csv`: Média e desvio-padrão das métricas.
+- `output/stability_results_article_table.csv`: Resultados formatados para uso no relatório.
+- `output/11_estabilidade_seeds.png`: Comparação visual da estabilidade dos modelos.
 
 
 ## Referências
