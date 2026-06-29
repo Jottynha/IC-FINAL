@@ -22,7 +22,6 @@ Predição de Readmissão Hospitalar de Pacientes Diabéticos Utilizando Técnic
 <p><strong>Disciplina:</strong> Inteligência Computacional<br>
 <strong>Instituição:</strong> Centro Federal de Educação Tecnológica de Minas Gerais (CEFET-MG) - Campus V Divinópolis<br>
 <strong>Professor:</strong> Alisson Marques da Silva<br>
-<strong>Projeto:</strong> "Trabalho Intermediário"<br>
 <strong>Projeto:</strong> Trabalho Final<br>
 <strong>Alunos:</strong> João Pedro Rodrigues Silva e Pedro Augusto Gontijo Moura<br>
 </div>
